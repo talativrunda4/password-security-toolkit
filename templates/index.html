@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Password Security Toolkit</title>
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg:       #0a0c10;
+      --panel:    #0f1218;
+      --border:   #1e2530;
+      --accent:   #00e5ff;
+      --accent2:  #7b2fff;
+      --green:    #00ff88;
+      --yellow:   #ffd600;
+      --red:      #ff3d5a;
+      --text:     #c8d6e5;
+      --dim:      #4a5568;
+      --font-mono: 'Share Tech Mono', monospace;
+      --font-ui:   'Rajdhani', sans-serif;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-ui);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 16px 60px;
+      background-image:
+        radial-gradient(ellipse 80% 50% at 50% -20%, rgba(0,229,255,0.07) 0%, transparent 60%),
+        repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(30,37,48,0.5) 40px),
+        repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(30,37,48,0.5) 40px);
+    }
+
+    /* ── Header ── */
+    header {
+      text-align: center;
+      margin-bottom: 48px;
+      animation: fadeDown 0.6s ease both;
+    }
+    .logo-ring {
+      width: 72px; height: 72px;
+      border: 2px solid var(--accent);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 16px;
+      box-shadow: 0 0 20px rgba(0,229,255,0.3), inset 0 0 20px rgba(0,229,255,0.05);
+      animation: pulse 3s ease-in-out infinite;
+    }
+    .logo-ring svg { width: 36px; height: 36px; stroke: var(--accent); fill: none; stroke-width: 1.5; }
+    h1 {
+      font-family: var(--font-ui);
+      font-size: 2rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #fff;
+    }
+    h1 span { color: var(--accent); }
+    .subtitle {
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      color: var(--dim);
+      letter-spacing: 0.2em;
+      margin-top: 6px;
+    }
+
+    /* ── Main grid ── */
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      width: 100%;
+      max-width: 900px;
+    }
+    @media(max-width:680px){ .grid{ grid-template-columns:1fr; } }
+
+    /* ── Panel ── */
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 28px;
+      position: relative;
+      overflow: hidden;
+      animation: fadeUp 0.6s ease both;
+    }
+    .panel::before {
+      content:'';
+      position:absolute; top:0; left:0; right:0; height:2px;
+      background: linear-gradient(90deg, transparent, var(--accent), transparent);
+      opacity: 0.6;
+    }
+    .panel:nth-child(2){ animation-delay:0.1s; }
+    .panel:nth-child(3){ animation-delay:0.2s; grid-column: 1/-1; }
+
+    .panel-title {
+      font-size: 0.72rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--accent);
+      font-family: var(--font-mono);
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .panel-title::before {
+      content:'//';
+      color: var(--dim);
+    }
+
+    /* ── Inputs ── */
+    label {
+      display: block;
+      font-size: 0.8rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--dim);
+      margin-bottom: 8px;
+    }
+    input[type="text"], input[type="password"], input[type="number"] {
+      width: 100%;
+      background: rgba(0,0,0,0.4);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text);
+      font-family: var(--font-mono);
+      font-size: 0.95rem;
+      padding: 12px 14px;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      margin-bottom: 16px;
+    }
+    input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(0,229,255,0.08);
+    }
+
+    /* Range slider */
+    .range-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    input[type="range"] {
+      flex: 1;
+      -webkit-appearance: none;
+      height: 4px;
+      background: var(--border);
+      border-radius: 4px;
+      outline: none;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 16px; height: 16px;
+      border-radius: 50%;
+      background: var(--accent);
+      cursor: pointer;
+      box-shadow: 0 0 8px rgba(0,229,255,0.5);
+    }
+    .range-val {
+      font-family: var(--font-mono);
+      font-size: 1rem;
+      color: var(--accent);
+      min-width: 28px;
+      text-align: center;
+    }
+
+    /* ── Buttons ── */
+    .btn {
+      width: 100%;
+      padding: 13px;
+      border: none;
+      border-radius: 6px;
+      font-family: var(--font-ui);
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.2s;
+      position: relative;
+      overflow: hidden;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, #007aff, var(--accent2));
+      color: #fff;
+      box-shadow: 0 4px 20px rgba(0,122,255,0.3);
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 28px rgba(0,122,255,0.4);
+    }
+    .btn-primary:active { transform: translateY(0); }
+    .btn-secondary {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text);
+      margin-top: 10px;
+    }
+    .btn-secondary:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    /* ── Generated password display ── */
+    .pw-display {
+      background: rgba(0,0,0,0.5);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 14px 16px;
+      font-family: var(--font-mono);
+      font-size: 1.05rem;
+      letter-spacing: 0.05em;
+      word-break: break-all;
+      color: var(--green);
+      margin-bottom: 12px;
+      min-height: 52px;
+      display: flex;
+      align-items: center;
+      transition: all 0.3s;
+    }
+    .pw-display.empty { color: var(--dim); font-size: 0.85rem; }
+
+    /* ── Strength meter ── */
+    .meter-wrap { margin: 18px 0 10px; }
+    .meter-label {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      font-size: 0.8rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+    .meter-bar-bg {
+      height: 6px;
+      background: var(--border);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .meter-bar {
+      height: 100%;
+      border-radius: 4px;
+      transition: width 0.5s cubic-bezier(.4,0,.2,1), background 0.4s;
+      width: 0%;
+    }
+    .score-text { font-family: var(--font-mono); font-size: 0.85rem; color: var(--dim); }
+
+    /* Strength colours */
+    .strength-weak   { color: var(--red); }
+    .strength-medium { color: var(--yellow); }
+    .strength-strong { color: var(--green); }
+    .bar-weak   { background: var(--red);    box-shadow: 0 0 8px rgba(255,61,90,0.5); }
+    .bar-medium { background: var(--yellow); box-shadow: 0 0 8px rgba(255,214,0,0.4); }
+    .bar-strong { background: var(--green);  box-shadow: 0 0 8px rgba(0,255,136,0.4); }
+
+    /* ── Suggestions ── */
+    .suggestions { margin-top: 16px; }
+    .sug-title {
+      font-size: 0.72rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--dim);
+      margin-bottom: 10px;
+      font-family: var(--font-mono);
+    }
+    .sug-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      font-size: 0.9rem;
+      color: var(--text);
+      padding: 6px 0;
+      border-bottom: 1px solid rgba(30,37,48,0.6);
+      animation: fadeIn 0.3s ease both;
+    }
+    .sug-item:last-child { border-bottom: none; }
+    .sug-icon { color: var(--yellow); flex-shrink: 0; margin-top: 2px; }
+
+    /* ── History ── */
+    .history-list { display: flex; flex-direction: column; gap: 10px; }
+    .hist-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(0,0,0,0.3);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 10px 14px;
+      font-family: var(--font-mono);
+      font-size: 0.88rem;
+      animation: fadeIn 0.3s ease both;
+    }
+    .hist-pw { color: var(--text); }
+    .hist-badge {
+      font-size: 0.72rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-family: var(--font-ui);
+      font-weight: 700;
+    }
+    .badge-weak   { background: rgba(255,61,90,0.15);  color: var(--red);    border: 1px solid rgba(255,61,90,0.3); }
+    .badge-medium { background: rgba(255,214,0,0.1);   color: var(--yellow); border: 1px solid rgba(255,214,0,0.3); }
+    .badge-strong { background: rgba(0,255,136,0.1);   color: var(--green);  border: 1px solid rgba(0,255,136,0.3); }
+    .hist-score { color: var(--dim); font-size: 0.8rem; margin-left: 8px; }
+
+    .empty-state {
+      text-align: center;
+      color: var(--dim);
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      padding: 20px;
+    }
+
+    /* ── Toast ── */
+    .toast {
+      position: fixed;
+      bottom: 32px; right: 32px;
+      background: var(--panel);
+      border: 1px solid var(--accent);
+      border-radius: 8px;
+      padding: 12px 20px;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      color: var(--accent);
+      box-shadow: 0 0 20px rgba(0,229,255,0.2);
+      transform: translateY(20px);
+      opacity: 0;
+      transition: all 0.3s;
+      z-index: 999;
+    }
+    .toast.show { transform: translateY(0); opacity: 1; }
+
+    /* ── Animations ── */
+    @keyframes fadeDown { from{opacity:0;transform:translateY(-16px)} to{opacity:1;transform:none} }
+    @keyframes fadeUp   { from{opacity:0;transform:translateY(16px)}  to{opacity:1;transform:none} }
+    @keyframes fadeIn   { from{opacity:0}                             to{opacity:1} }
+    @keyframes pulse    {
+      0%,100% { box-shadow: 0 0 20px rgba(0,229,255,0.3), inset 0 0 20px rgba(0,229,255,0.05); }
+      50%     { box-shadow: 0 0 35px rgba(0,229,255,0.5), inset 0 0 30px rgba(0,229,255,0.1); }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="logo-ring">
+      <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+    </div>
+    <h1>Password <span>Security</span> Toolkit</h1>
+    <p class="subtitle">// generate · analyse · track</p>
+  </header>
+
+  <div class="grid">
+
+    <!-- ── Panel 1: Generator ── -->
+    <div class="panel">
+      <div class="panel-title">Password Generator</div>
+
+      <label>Length: <span id="lenDisplay">16</span> characters</label>
+      <div class="range-row">
+        <input type="range" id="lengthRange" min="8" max="64" value="16"
+               oninput="document.getElementById('lenDisplay').textContent=this.value">
+      </div>
+
+      <div class="pw-display empty" id="genOutput">// click generate</div>
+
+      <button class="btn btn-primary" onclick="generatePassword()">Generate Password</button>
+      <button class="btn btn-secondary" onclick="copyPassword()">Copy to Clipboard</button>
+    </div>
+
+    <!-- ── Panel 2: Checker ── -->
+    <div class="panel">
+      <div class="panel-title">Strength Checker</div>
+
+      <label>Enter your password</label>
+      <input type="text" id="checkInput" placeholder="Type password here…" oninput="liveCheck(this.value)"/>
+
+      <div class="meter-wrap">
+        <div class="meter-label">
+          <span id="strengthLabel" class="score-text">—</span>
+          <span id="scoreNum" class="score-text">0 / 10</span>
+        </div>
+        <div class="meter-bar-bg">
+          <div class="meter-bar" id="meterBar"></div>
+        </div>
+      </div>
+
+      <div class="suggestions" id="suggestionsBox"></div>
+    </div>
+
+    <!-- ── Panel 3: History (full width) ── -->
+    <div class="panel">
+      <div class="panel-title">Recent History (last 3)</div>
+      <div class="history-list" id="historyList">
+        <div class="empty-state">No passwords checked yet.</div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    // ── Generate ──────────────────────────────
+    async function generatePassword() {
+      const length = document.getElementById('lengthRange').value;
+      const res = await fetch('/api/generate', {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({length})
+      });
+      const data = await res.json();
+      const out = document.getElementById('genOutput');
+      out.textContent = data.password;
+      out.classList.remove('empty');
+    }
+
+    function copyPassword() {
+      const pw = document.getElementById('genOutput').textContent;
+      if (!pw || pw.startsWith('//')) { showToast('Generate a password first!'); return; }
+      navigator.clipboard.writeText(pw).then(() => showToast('Copied to clipboard!'));
+    }
+
+    // ── Check (live) ──────────────────────────
+    let debounceTimer;
+    function liveCheck(value) {
+      clearTimeout(debounceTimer);
+      if (!value) { resetMeter(); return; }
+      debounceTimer = setTimeout(() => checkStrength(value), 250);
+    }
+
+    async function checkStrength(password) {
+      const res = await fetch('/api/check', {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({password})
+      });
+      const data = await res.json();
+      if (data.error) return;
+
+      // Update meter
+      const pct = (data.score / 10) * 100;
+      const bar  = document.getElementById('meterBar');
+      const lbl  = document.getElementById('strengthLabel');
+      const num  = document.getElementById('scoreNum');
+
+      bar.style.width = pct + '%';
+      bar.className   = 'meter-bar bar-' + data.strength.toLowerCase();
+      lbl.textContent = data.strength;
+      lbl.className   = 'score-text strength-' + data.strength.toLowerCase();
+      num.textContent = data.score + ' / 10';
+
+      // Suggestions
+      const box = document.getElementById('suggestionsBox');
+      if (data.suggestions.length === 0) {
+        box.innerHTML = '<div class="sug-item"><span class="sug-icon">✓</span> Looks great — no improvements needed!</div>';
+      } else {
+        box.innerHTML = '<div class="sug-title">Suggestions</div>' +
+          data.suggestions.map(s =>
+            `<div class="sug-item"><span class="sug-icon">›</span>${s}</div>`
+          ).join('');
+      }
+
+      // Refresh history
+      loadHistory();
+    }
+
+    function resetMeter() {
+      document.getElementById('meterBar').style.width = '0%';
+      document.getElementById('meterBar').className = 'meter-bar';
+      document.getElementById('strengthLabel').textContent = '—';
+      document.getElementById('scoreNum').textContent = '0 / 10';
+      document.getElementById('suggestionsBox').innerHTML = '';
+    }
+
+    // ── History ───────────────────────────────
+    async function loadHistory() {
+      const res  = await fetch('/api/history');
+      const data = await res.json();
+      const list = document.getElementById('historyList');
+
+      if (!data.history.length) {
+        list.innerHTML = '<div class="empty-state">No passwords checked yet.</div>';
+        return;
+      }
+
+      list.innerHTML = [...data.history].reverse().map(h => {
+        const cls = h.strength.toLowerCase();
+        return `
+          <div class="hist-item">
+            <span class="hist-pw">${h.masked}</span>
+            <div style="display:flex;align-items:center;gap:6px">
+              <span class="hist-badge badge-${cls}">${h.strength}</span>
+              <span class="hist-score">${h.score}/10</span>
+            </div>
+          </div>`;
+      }).join('');
+    }
+
+    // ── Toast ─────────────────────────────────
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 2200);
+    }
+
+    // Init
+    loadHistory();
+  </script>
+</body>
+</html>
